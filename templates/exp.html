@@ -56,15 +56,12 @@
         };
 
         /* stimulus block */
-        var things = ['Packs', 'Pages', 'Panes', 'Pearls', 'Pears', 'Photos', 'Pills', 'Poems', 'Prices'];
-        var styles = ['left', 'rotated-c', 'rotated-cc', 'topleft', 'topright', 'vertical'];
+        var things = jsPsych.randomization.repeat(['Packs', 'Pages', 'Panes', 'Pearls', 'Pears', 'Photos', 'Pills', 'Poems', 'Prices'], 1);
+        var styles = jsPsych.randomization.repeat(['left', 'rotated-c', 'rotated-cc', 'topleft', 'topright', 'vertical'], 1);
         var test_stimuli = []
-
-        for (var i = 0; i < things.length; i++) {
-            for (var j = 0; j < styles.length; j++) {
-                test_stimuli.push('/static/images/plots/' + things[i] + '-' + styles[j] + '.png');
-            }
-        }
+        var zipped = _.zip(styles, things);
+        var trials = _.map(zipped, function(l) { return '/static/images/plots/' + l[1] + '-' + l[0] + '.png'});
+        
 
         // var test_stimuli = [{
         //     image: "/static/images/blue.png",
@@ -78,7 +75,7 @@
         //     }
         // }];
 
-        var all_trials = jsPsych.randomization.repeat(test_stimuli, 10);//, true);
+        var all_trials = jsPsych.randomization.repeat(test_stimuli, 1);
 
         var post_trial_gap = function() {
             return Math.floor(Math.random() * 1500) + 750;
@@ -86,7 +83,7 @@
 
         var test_block = {
             type: "single-stim",
-            stimuli: all_trials,
+            stimuli: trials,
             choices: ['F'],
             // timing_stim: 1500,
             timing_response: 1500,
