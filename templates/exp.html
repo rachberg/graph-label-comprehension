@@ -52,36 +52,33 @@
                 "<p class='small'><strong>Press the F key</strong></p></div>" + 
                 "<div class='right center-content'><img src='/static/images/orange.png'></img>" + 
                 "<p class='small'><strong>Do not press a key</strong></p></div>" + 
-                "<p>Press any key to begin.</p>",
+                "<p>Press any key to begin. Mor buys fewer packs of gum each year.</p>",
+                
             timing_post_trial: 2000
         };
 
 
-
-
-        /* stimulus block */
-
-        // var vignette_block = {
-        //     type: 'multi-stim-multi-response',
-        //     stimuli: [['/static/images/plots/Packs-left.png', '/static/images/plots/Packs-vertical.png']],
-        //     choices: [[89,78]], // Y or N
-        //     timing_stim: [1000,-1],
-        //     prompt: 'Did the face get happier?'
-        // }
-
-        var things = jsPsych.randomization.repeat(['Pages', 'Panes', 'Pearls', 'Pears', 'Photos', 'Pills', 'Poems', 'Prices'], 1);
+        // var things = jsPsych.randomization.repeat(['Pages', 'Panes', 'Pearls', 'Pears', 'Photos', 'Pills', 'Poems', 'Prices'], 1);
         //Note: Packs will be the example
+        var things = ['Pages', 'Panes', 'Pearls', 'Pears', 'Photos', 'Pills', 'Poems', 'Prices'];
+        var texts = ['Mel writes more pages of her book each year.', 'Every year Mia cleans fewer window panes.', 'Mya sells more pearls every year.', 'Min sells the same number of pears each year.', 'Mab takes more photos every year', 'Meg prescribes 15 kinds of pills every year.', 'Mae writes 12 poems every year.', 'May lowers the price of her product every year.']
+        var vignettes = _.map(texts, function (text) {
+            return "<center><h1>" + text + "</h1></center>";
+        })
+
+        things_and_vignettes = jsPsych.randomization.repeat(_.zip(things,vignettes), 1);
+
         var styles = jsPsych.randomization.repeat(['left', 'rotated-c', 'rotated-cc', 'topleft', 'topright', 'vertical'], 1);
         styles.push('left', 'rotated-c') //TODO: remove these, actually randomize the catch trials
-        var test_stimuli = []
 
-        // var vignettes = ["<p> Peaches</p>", "<p> Peaches</p>", "<p> Peaches</p>", "<p> Peaches</p>" , "<p> Peaches</p>", "<p> Peaches</p>",]
-        var zipped = _.zip(styles, things);
-        var trials = _.map(zipped, function(l) {
-            return ['<h1>' + l[1] + '</h1>', '<img src="/static/images/plots/' + l[1] + '-' + l[0] + '.png"></img>']});
-            
-
-        var all_trials = jsPsych.randomization.repeat(test_stimuli, 1);
+        var trials = [];
+        function get_image(thing, style) {
+            return '<img src="/static/images/plots/' + thing + '-' + style + '.png"></img>'
+        }
+        
+        for (var i = 0; i < 8; i++) {
+            trials.push([things_and_vignettes[i][1], get_image(things_and_vignettes[i][0], styles[i])]);
+        }
 
         var post_trial_gap = function() {
             return Math.floor(Math.random() * 1500) + 750;
@@ -94,9 +91,9 @@
             stimuli: trials,
             choices: [[89,78]],
             is_html: true,
-            timing_stim: [1000, -1],
+            timing_stim: [-1, -1],
             timing_response: -1,
-            response_ends_trial: true
+            response_ends_trial: false
             // timing_post_trial: post_trial_gap,
             // data: all_trials.data
         };
