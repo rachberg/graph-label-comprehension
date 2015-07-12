@@ -58,7 +58,9 @@
         };
 
 
-        // var things = jsPsych.randomization.repeat(['Pages', 'Panes', 'Pearls', 'Pears', 'Photos', 'Pills', 'Poems', 'Prices'], 1);
+        var trial_types = jsPsych.randomization.repeat(["good", "good", "good", "good", "catch", "catch", "wrong-data", "wrong-data"], 1);
+
+
         //Note: Packs will be the example
         var things = ['Pages', 'Panes', 'Pearls', 'Pears', 'Photos', 'Pills', 'Poems', 'Prices'];
         var texts = ['Mel writes more pages of her book each year.', 'Every year Mia cleans fewer window panes.', 'Mya sells more pearls every year.', 'Min sells the same number of pears each year.', 'Mab takes more photos every year', 'Meg prescribes 15 kinds of pills every year.', 'Mae writes 12 poems every year.', 'May lowers the price of her product every year.']
@@ -72,20 +74,19 @@
         styles.push('left', 'rotated-c') //TODO: remove these, actually randomize the catch trials
 
         var trials = [];
-        function get_image(thing, style) {
-            return '<img src="/static/images/plots/' + thing + '-' + style + '.png"></img>'
+        function get_image(thing, style, trial_type) {
+            return '<img src="/static/images/plots/' + trial_type + '/'+ thing + '-' + style + '.png"></img>'
         }
         
         for (var i = 0; i < 8; i++) {
-            trials.push([things_and_vignettes[i][1], get_image(things_and_vignettes[i][0], styles[i])]);
+            trials.push([things_and_vignettes[i][1], get_image(things_and_vignettes[i][0], styles[i], trial_types[i])]);
         }
 
         var post_trial_gap = function() {
             return Math.floor(Math.random() * 1500) + 750;
         };
-        function times_9 (t) {
-             return Array.apply(null, new Array(9)).map(function(){return t})
-        }
+        
+        console.log(trials);
         var test_block = {
             type: "multi-stim-multi-response",
             stimuli: trials,
@@ -111,7 +112,7 @@
 
         function getAverageResponseTime() {
 
-            var trials = jsPsych.dataAPI.getTrialsOfType('single-stim');
+            var trials = jsPsych.dataAPI.getTrialsOfType('multi-stim-multi-response');
 
             var sum_rt = 0;
             var valid_trial_count = 0;
@@ -130,13 +131,8 @@
         var experiment_blocks = [];
 
         experiment_blocks.push(welcome_block);
-
         experiment_blocks.push(instructions_block);
-
-        // experiment_blocks.push(vignette_block);
-
         experiment_blocks.push(test_block);
-
         experiment_blocks.push(debrief_block);
 
 
