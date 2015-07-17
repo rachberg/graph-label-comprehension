@@ -75,31 +75,45 @@
         var styles = jsPsych.randomization.repeat(['left', 'rotated-c', 'rotated-cc', 'topleft', 'topright', 'vertical'], 1);
         styles.push('left', 'rotated-c') //TODO: remove these, actually randomize the catch trials
 
-        var trials = [];
+        var blocks = [];
         function get_image(thing, style, trial_type) {
             return '<img src="/static/images/plots/' + trial_type + '/'+ thing + '-' + style + '.png"></img>'
         }
         
         for (var i = 0; i < 8; i++) {
-            trials.push([things_and_vignettes[i][1], get_image(things_and_vignettes[i][0], styles[i], trial_types[i])]);
+            blocks.push(make_prompt_block(things_and_vignettes[i][1]));
+            var image = get_image(things_and_vignettes[i][0], styles[i], trial_types[i]);
+            if(trial_types[i] == "good") {
+                blocks.push(make_image_block(image, '89'));
+            }
+            else
+            {
+                blocks.push(make_image_block(image, '78'));
+            }
         }
 
-        var post_trial_gap = function() {
-            return Math.floor(Math.random() * 1500) + 750;
-        };
-        
-        console.log(trials);
-        var test_block = {
-            type: "multi-stim-multi-response",
-            stimuli: trials,
-            choices: [[89,78]],
-            is_html: true,
-            timing_stim: [4000, -1],
-            timing_response: -1,
-            response_ends_trial: true
-            // timing_post_trial: post_trial_gap,
-            // data: all_trials.data
-        };
+        function make_prompt_block(stim) {
+            return {
+                type: "single-stim",
+                stimuli: stim,
+                is_html:true
+            };            
+        }
+
+        function make_image_block(stim, answer) {
+            return {
+                type: "categorize",
+                stimuli: stim,
+                choices: [89,78],
+                is_html: true,
+                key_answer: [answer],
+                correct_text: "<p class='prompt'>Correct.</p>",
+                // correct_text: "<p class='prompt'>Correct, this is a %ANS%.</p>",
+                incorrect_text: "<p class='prompt'>Incorrect.</p>"
+                // incorrect_text: "<p class='prompt'>Incorrect, this is a %ANS%.</p>",
+            };            
+        }
+
 
         /* debrief block */
 
@@ -134,7 +148,7 @@
 
         experiment_blocks.push(welcome_block);
         experiment_blocks.push(instructions_block);
-        experiment_blocks.push(test_block);
+        experiment_blocks = experiment_blocks.concat(blocks);
         experiment_blocks.push(debrief_block);
 
 
