@@ -1,8 +1,22 @@
 $(window).load(function () {
-console.log("in task")
-
-/* load psiturk */
 var psiturk = new PsiTurk(uniqueId, adServerLoc, mode);
+
+function bit_test(num,bit){
+    return ((num>>bit) % 2 != 0)
+}
+var int_cond = parseInt(condition) - 1;
+
+var BNT_first = bit_test(int_cond, 2);
+var vignette_first = bit_test(int_cond, 1);
+var a_for_correct = bit_test(int_cond, 0);
+
+var answer_key = {};
+if(a_for_correct) {
+	answer_key = {"good": 65, "catch": 76, "wrong-data": 76};
+} else {
+	answer_key = {"good": 76, "catch": 65, "wrong-data": 65};
+}
+
 
 /* text blocks */
 
@@ -32,13 +46,15 @@ var BNT_block = {
     rows: [[1]],
 };
 
+var correct_letter = a_for_correct ? 'A' : 'L';
+var   wrong_letter = a_for_correct ? 'L' : 'A';
 
 var exp_vignette_first_instructions_block = {
 	type: "text",
 	text: "<p>In this part of the experiment, you will read a sentence. Shortly after, a graph will appear in the center of the screen. </p>" +
 	"<h3>Please place your left index finger on the 'A' letter on your keyboard and place your right index finger on the 'L' letter on your keyboard.</h3>" +
-	"<p>If the graph accurately represents <strong>all</strong> parts of the information from the sentence shown, type the letter 'A.' If it does not, press the " +
-	"letter 'L.' It is important to press the A or L key <strong>as fast as you can</strong> without making errors. Be sure that the figure matches the name, product, and data trend mentioned in the sentence.</p>" +
+	"<p>If the graph accurately represents <strong>all</strong> parts of the information from the sentence shown, type the letter '" + correct_letter + ".' If it does not, press the " +
+	"letter '" + wrong_letter + ".' It is important to press the A or L key <strong>as fast as you can</strong> without making errors. Be sure that the figure matches the name, product, and data trend mentioned in the sentence.</p>" +
 	"<p>Please proceed to an example trial, where no data will be recorded.</p> <p>Press any key to begin the example trial.</p>",
 	timing_post_trial: 2000
 };
@@ -47,8 +63,8 @@ var exp_image_first_instructions_block = {
 	type: "text",
 	text: "<p>In this part of the experiment, you will see a graph appear. Shortly after, a sentence will appear in the center of the screen. </p>" +
 	"<h3>Please place your left index finger on the 'A' letter on your keyboard and place your right index finger on the 'L' letter on your keyboard.</h3>" +
-	"<p>If the setence accurately describes <strong>all</strong> parts of the information represented in the graph shown, type the letter 'A.' If it does not, press the " +
-	"letter 'L.' It is important to press the A or L key <strong>as fast as you can</strong> without making errors. Be sure that the sentence matches the name, labels, and content of the graph.</p>" +
+	"<p>If the setence accurately describes <strong>all</strong> parts of the information represented in the graph shown, type the letter '" + correct_letter + ".' If it does not, press the " +
+	"letter '" + wrong_letter + ".' It is important to press the A or L key <strong>as fast as you can</strong> without making errors. Be sure that the sentence matches the name, labels, and content of the graph.</p>" +
 	"<p>Please proceed to an example trial, where no data will be recorded.</p> <p>Press any key to begin the example trial.</p>",
 	timing_post_trial: 2000
 };
@@ -58,7 +74,7 @@ var exp_ex_block = {
 	stimuli: [get_image("Packs", "left", "good")],
 	choices: [65,76],
 	is_html: true,
-	key_answer: [65],
+	key_answer: [answer_key["good"]],
 	timing_feedback_duration: 2000,
 	correct_text: "<center><p class='prompt' style='color:green'>Your response is correct.</p></center>",
         // correct_text: "<p class='prompt'>Correct, this is a %ANS%.</p>",
@@ -100,16 +116,14 @@ var vignette = "<center><h1>Mia buys fewer packs of gum every year.</h1></center
 var image = get_image('Packs', 'left', "good");
 if (vignette_first) {
 	example_blocks.push(make_stim_block(vignette));
-	example_blocks.push(make_cat_block(image, 65));
+	example_blocks.push(make_cat_block(image, answer_key["good"]));
 } else {
 	example_blocks.push(make_stim_block(image));
-	example_blocks.push(make_cat_block(vignette, 65));
+	example_blocks.push(make_cat_block(vignette, answer_key["good"]));
 }
 
 function get_exp_blocks(vignette_first) {
 	var blocks = [];
-	var answer_key = {"good": "65", "catch": "76", "wrong-data": "76"};
-
 	for (var i = 0; i < 8; i++) {
 		var image = get_image(things_and_vignettes[i][0], rand_styles[i], trial_types[i]);
 		var stim, thing_to_cat;
@@ -161,10 +175,6 @@ var debrief_block = {
 		"participating!</p>"; 
 	}
 };
-
-
-var BNT_first = false;
-var vignette_first = false;
 
 function push_BNT(experiment_blocks) {
 	experiment_blocks.push(BNT_instructions_block);

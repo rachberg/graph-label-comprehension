@@ -1,5 +1,5 @@
 /**
- * jspsych-survey-text
+ * jspsych-survey-numeric
  * a jspsych plugin for free response survey questions
  *
  * Josh de Leeuw
@@ -97,8 +97,6 @@
           obje[id] = val;
           $.extend(question_data, obje);
         });
-        console.log("Writing trial results:");
-        console.log(question_data);
         // save data
         jsPsych.data.write({
           "rt": response_time,
